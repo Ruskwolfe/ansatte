@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<title>Ansatte Datahåndtering</title>
+<style>
+  body { font-family: Arial, sans-serif; }
+  .container { margin: 20px; }
+  label { margin-right: 10px; }
+  .slider-label { width: 120px; display: inline-block; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h2>Legg til ansatt</h2>
+  <label>Kallenavn: <input type="text" id="nickname"></label>
+  <label>Nummer: <input type="text" id="number"></label>
+  <h4>Kompetanse:</h4>
+  <div>
+    <label class="slider-label">Våpen:</label>
+    <input type="range" min="0" max="9" id="weapons">
+    <span id="weaponsLabel">Trenger opplæring</span>
+    <br>
+    <label class="slider-label">Telt:</label>
+    <input type="range" min="0" max="9" id="Telt">
+    <span id="TeltLabel">Trenger opplæring</span>
+  </div>
+  <button onclick="addEmployee()">Lagre ansatt</button>
+  <button onclick="showEmployees()">Vis ansatte</button>
+  <div id="output"></div>
+</div>
+
+<script>
+let employees = [];
+let approvedNumbers = [];
+
+// Last inn godkjente nummer fra en lokal JSON-fil ved oppstart
+fetch('./approvedNumbers.json')
+  .then(response => response.json())
+  .then(data => approvedNumbers = data)
+  .catch(error => console.error('Error loading the numbers:', error));
+
+function addEmployee() {
+  const nickname = document.getElementById('nickname').value;
+  const number = document.getElementById('number').value;
+
+  if (!approvedNumbers.includes(number)) {
+    alert('Kun gyldig nummer. Dette nummeret tilhører ikke en ansatt.');
+    return;
+  }
+
+  const weapons = document.getElementById('weapons').value;
+  const Telt = document.getElementById('Telt').value;
+  const employee = {
+    nickname: nickname,
+    number: number,
+    competencies: {
+      weapons: parseInt(weapons),
+      Telt: parseInt(Telt),
+    }
+  };
+  employees.push(employee);
+  console.log(employees); // For debug purposes
+  document.getElementById('output').innerHTML = JSON.stringify(employees, null, 2);
+}
+
+function showEmployees() {
+  document.getElementById('output').innerHTML = JSON.stringify(employees, null, 2);
+}
+
+document.getElementById('weapons').addEventListener('input', function() {
+  const labels = ['I know Nåthing!', 'Vet hva ei børse er for å si det slik', 'Kan forskjell på hagle og rifle', 'Jeg var med på banen og skøyt en gang', 'Jeg har eget våpen', 'Jeg er aktiv jeger', 'Jeg vet hvorfor det heter 30-06 for å si det slik', 'Jeg kan demontere en BRX-1 i blinde', 'Jeg vet mer enn det du noen gang vil','Stian spør MEG om råd'];
+  document.getElementById('weaponsLabel').textContent = labels[this.value];
+});
+document.getElementById('Telt').addEventListener('input', function() {
+  const labels = ['Skal jeg spise spaggeti og bo i et telt ?', 'Jeg har vært i Roskilde', 'Jeg har vært på teltur', 'Eier eget fjelltelt', 'Har teltet ute flere ganger jeg', 'La meg vise deg hvorfor du må ha bunnduk', 'Jeg kan slå opp en lavvu på under 2 minutter', 'La meg forklare forksjellen på alle teltdukene våre', 'Jeg kan instruere en komplett idiot på hvordan å fikse et fjelltelt på vidda','Var meg Lars Monsen ble opplært av'];
+  document.getElementById('TeltLabel').textContent = labels[this.value];
+});
+</script>
+</body>
+</html>
